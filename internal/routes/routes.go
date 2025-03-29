@@ -9,4 +9,10 @@ import (
 func InitRoutes(e *echo.Echo) {
 	// endpoint health check
 	e.GET("/health-check", handlers.HealthCheckHandler)
+
+	// Grouping the routes
+	v1 := e.Group("/api/v1")
+
+	// endpoint for user authentication
+	InitAuthRoutes(v1)
 }
