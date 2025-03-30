@@ -73,3 +73,40 @@ func TestCreateMovie_Success(t *testing.T) {
 	testDB.Where("id = ?", movie.ID).Delete(&models.Movie{})
 	testDB.Unscoped().Delete(&models.Movie{})
 }
+
+func TestUpdateMovie_Success(t *testing.T) {
+	// Insert dummy movie
+	movie := &models.Movie{
+		ID:          utils.GenerateUUID(),
+		Title:       "Old Title",
+		Description: "Old Description",
+		Genre:       "Action",
+		Rating:      7.0,
+	}
+	testDB.Create(&movie)
+
+	// Update movie
+	updatedMovie := models.Movie{
+		ID:          movie.ID,
+		Title:       "New Title",
+		Description: "New Description",
+		Genre:       "Sci-Fi",
+		Rating:      8.5,
+	}
+
+	err := movieRepo.UpdateMovie(&updatedMovie)
+	assert.NoError(t, err)
+
+	// Verify update
+	var result models.Movie
+	testDB.First(&result, movie.ID)
+
+	assert.Equal(t, updatedMovie.Title, result.Title)
+	assert.Equal(t, updatedMovie.Description, result.Description)
+	assert.Equal(t, updatedMovie.Genre, result.Genre)
+	assert.Equal(t, updatedMovie.Rating, result.Rating)
+
+	// Clean up record
+	testDB.Where("id = ?", movie.ID).Delete(&models.Movie{})
+	testDB.Unscoped().Delete(&models.Movie{})
+}
