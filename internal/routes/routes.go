@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/stwrtrio/movie-festival-api/internal/handlers"
+	"github.com/stwrtrio/movie-festival-api/internal/middlewares"
 )
 
 // InitRoutes to initializes the routes for the application
@@ -15,6 +16,8 @@ func InitRoutes(e *echo.Echo, movieHandler *handlers.MovieHandler) {
 
 	// endpoint for user authentication
 	InitAuthRoutes(v1)
+
+	v1.Use(middlewares.AuthMiddleware)
 
 	// endpoint for movie
 	InitMovieRoutes(v1, movieHandler)

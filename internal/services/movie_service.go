@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"errors"
 
 	"github.com/stwrtrio/movie-festival-api/internal/models"
 	"github.com/stwrtrio/movie-festival-api/internal/repositories"
@@ -21,5 +20,5 @@ func NewMovieService(repo repositories.MovieRepository) MovieService {
 }
 
 func (s *movieService) CreateMovie(ctx context.Context, movie *models.Movie) error {
-	return errors.New("not implemented")
+	return s.repo.CreateMovie(ctx, movie)
 }

@@ -3,7 +3,6 @@ module github.com/stwrtrio/movie-festival-api
 go 1.24.1
 
 require (
-	go.uber.org/mock v0.5.0
 	golang.org/x/crypto v0.33.0
 	gorm.io/gorm v1.25.12
 )

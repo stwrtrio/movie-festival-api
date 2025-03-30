@@ -7,6 +7,15 @@ import (
 	"gorm.io/plugin/soft_delete"
 )
 
+type MovieRequest struct {
+	Title       string `json:"title" validate:"required"`
+	Description string `json:"description" validate:"required"`
+	Duration    int    `json:"duration" validate:"required"`
+	Genre       string `json:"genre" validate:"required"`
+	WatchURL    string `json:"watch_url" validate:"required"`
+	Artist      string `json:"artist" validate:"required"`
+}
+
 type Movie struct {
 	ID          string                `json:"id"`
 	Title       string                `json:"title"`
