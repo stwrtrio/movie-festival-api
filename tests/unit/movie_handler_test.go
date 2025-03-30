@@ -81,16 +81,17 @@ func TestUpdateMovieHandler_Success(t *testing.T) {
 	movieHandler := handlers.NewMovieHandler(mockService)
 
 	e := echo.New()
-	movie := &models.Movie{
-		ID:          "123",
+	movie := &models.MovieRequest{
 		Title:       "Inception",
 		Description: "A mind-bending thriller",
+		Duration:    148,
 		Genre:       "Sci-Fi",
-		Rating:      8.8,
+		WatchURL:    "http://example.com/watch",
+		Artist:      "Christopher Nolan",
 	}
 
 	jsonMovie, _ := json.Marshal(movie)
-	req := httptest.NewRequest(http.MethodPut, "/api/v1/movies/"+movie.ID, bytes.NewReader(jsonMovie))
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/movies/123", bytes.NewReader(jsonMovie))
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -113,16 +114,17 @@ func TestUpdateMovieHandler_Failed(t *testing.T) {
 	movieHandler := handlers.NewMovieHandler(mockService)
 
 	e := echo.New()
-	movie := &models.Movie{
-		ID:          " ",
-		Title:       "Inception",
+	movie := &models.MovieRequest{
+		Title:       "",
 		Description: "A mind-bending thriller",
+		Duration:    148,
 		Genre:       "Sci-Fi",
-		Rating:      8.8,
+		WatchURL:    "http://example.com/watch",
+		Artist:      "Christopher Nolan",
 	}
 
 	jsonMovie, _ := json.Marshal(movie)
-	req := httptest.NewRequest(http.MethodPut, "/api/v1/movies/"+movie.ID, bytes.NewReader(jsonMovie))
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/movies/123", bytes.NewReader(jsonMovie))
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)

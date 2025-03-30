@@ -92,7 +92,7 @@ func TestLoginFailed(t *testing.T) {
 	err := handlers.LoginHandler(c)
 
 	assert.NoError(t, err)
-	assert.Equal(t, http.StatusUnauthorized, rec.Code)
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
 
 func TestLoginSuccess(t *testing.T) {

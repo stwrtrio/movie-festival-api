@@ -6,6 +6,7 @@ import (
 	"github.com/stwrtrio/movie-festival-api/internal/models"
 	"github.com/stwrtrio/movie-festival-api/internal/services"
 	"github.com/stwrtrio/movie-festival-api/pkg/utils"
+	"github.com/stwrtrio/movie-festival-api/pkg/validator"
 
 	"github.com/labstack/echo/v4"
 )
@@ -23,6 +24,10 @@ func (h *MovieHandler) CreateMovie(c echo.Context) error {
 	var movieRequest models.MovieRequest
 	if err := c.Bind(&movieRequest); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request"})
+	}
+
+	if err := validator.ValidateStruct(movieRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
 	movie := models.Movie{
@@ -53,6 +58,10 @@ func (h *MovieHandler) UpdateMovie(c echo.Context) error {
 	var movieRequest models.MovieRequest
 	if err := c.Bind(&movieRequest); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+	}
+
+	if err := validator.ValidateStruct(movieRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
 	movie := models.Movie{

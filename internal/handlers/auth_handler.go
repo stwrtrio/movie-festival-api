@@ -1,17 +1,14 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/stwrtrio/movie-festival-api/config"
 	"github.com/stwrtrio/movie-festival-api/internal/models"
 	"github.com/stwrtrio/movie-festival-api/pkg/utils"
+	"github.com/stwrtrio/movie-festival-api/pkg/validator"
 )
-
-var validate = validator.New()
 
 func RegisterHandler(c echo.Context) error {
 	var user models.User
@@ -20,11 +17,8 @@ func RegisterHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	fmt.Println("req:", req)
-
-	if err := validate.Struct(&req); err != nil {
-		fmt.Println("here... ", err)
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	if err := validator.ValidateStruct(req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
 	hashedPassword, err := utils.HashPassword(req.Password)
@@ -47,6 +41,10 @@ func LoginHandler(c echo.Context) error {
 	var req models.UserRequest
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	if err := validator.ValidateStruct(req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
 	var user models.User
