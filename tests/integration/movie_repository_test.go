@@ -71,7 +71,7 @@ func TestCreateMovie_Success(t *testing.T) {
 
 	// Clean up record
 	testDB.Where("id = ?", movie.ID).Delete(&models.Movie{})
-	testDB.Unscoped().Delete(&models.Movie{})
+	testDB.Unscoped().Where("id = ?", movie.ID).Delete(&models.Movie{})
 }
 
 func TestUpdateMovie_Success(t *testing.T) {
@@ -108,5 +108,5 @@ func TestUpdateMovie_Success(t *testing.T) {
 
 	// Clean up record
 	testDB.Where("id = ?", result.ID).Delete(&models.Movie{})
-	testDB.Unscoped().Delete(&models.Movie{})
+	testDB.Unscoped().Where("id = ?", result.ID).Delete(&models.Movie{})
 }
