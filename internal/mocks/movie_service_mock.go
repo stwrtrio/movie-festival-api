@@ -48,3 +48,17 @@ func (mr *MockMovieServiceMockRecorder) CreateMovie(ctx, movie interface{}) *gom
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMovie", reflect.TypeOf((*MockMovieService)(nil).CreateMovie), ctx, movie)
 }
+
+// UpdateMovie mocks base method.
+func (m *MockMovieService) UpdateMovie(ctx context.Context, movie *models.Movie) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMovie", ctx, movie)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateMovie indicates an expected call of UpdateMovie.
+func (mr *MockMovieServiceMockRecorder) UpdateMovie(ctx, movie interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMovie", reflect.TypeOf((*MockMovieService)(nil).UpdateMovie), ctx, movie)
+}

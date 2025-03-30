@@ -55,3 +55,47 @@ func TestCreateMovie_Fail(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, "failed to create movie", err.Error())
 }
+
+func TestUpdateMovie_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockRepo := mocks.NewMockMovieRepository(ctrl)
+	movieService := services.NewMovieService(mockRepo)
+
+	movie := &models.Movie{
+		ID:          "123",
+		Title:       "Updated Title",
+		Description: "Updated Description",
+		Genre:       "Action",
+		Rating:      8.5,
+	}
+
+	mockRepo.EXPECT().UpdateMovie(gomock.Any(), gomock.Any()).Return(nil)
+
+	err := movieService.UpdateMovie(context.Background(), movie)
+	assert.NoError(t, err)
+}
+
+func TestUpdateMovie_Failed(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockRepo := mocks.NewMockMovieRepository(ctrl)
+	movieService := services.NewMovieService(mockRepo)
+
+	movie := &models.Movie{
+		ID:          "123",
+		Title:       "Updated Title",
+		Description: "Updated Description",
+		Genre:       "Action",
+		Rating:      8.5,
+	}
+
+	mockRepo.EXPECT().UpdateMovie(gomock.Any(), gomock.Any()).Return(errors.New("failed to update movie"))
+
+	err := movieService.UpdateMovie(context.Background(), movie)
+
+	assert.Error(t, err)
+	assert.Equal(t, "failed to update movie", err.Error())
+}

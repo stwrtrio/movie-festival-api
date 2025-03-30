@@ -8,4 +8,5 @@ import (
 
 func InitMovieRoutes(e *echo.Group, movieHandler *handlers.MovieHandler) {
 	e.POST("/movies", movieHandler.CreateMovie)
+	e.PUT("/movies/:id", movieHandler.UpdateMovie)
 }
