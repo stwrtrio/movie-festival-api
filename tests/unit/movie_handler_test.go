@@ -72,3 +72,67 @@ func TestCreateMovieHandler_Failed(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
+
+func TestUpdateMovieHandler_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockService := mocks.NewMockMovieService(ctrl)
+	movieHandler := handlers.NewMovieHandler(mockService)
+
+	e := echo.New()
+	movie := &models.Movie{
+		ID:          "123",
+		Title:       "Inception",
+		Description: "A mind-bending thriller",
+		Genre:       "Sci-Fi",
+		Rating:      8.8,
+	}
+
+	jsonMovie, _ := json.Marshal(movie)
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/movies/"+movie.ID, bytes.NewReader(jsonMovie))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/api/v1/movies/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("123")
+
+	mockService.EXPECT().UpdateMovie(gomock.Any(), gomock.Any()).Return(nil)
+
+	err := movieHandler.UpdateMovie(c)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+}
+
+func TestUpdateMovieHandler_Failed(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockService := mocks.NewMockMovieService(ctrl)
+	movieHandler := handlers.NewMovieHandler(mockService)
+
+	e := echo.New()
+	movie := &models.Movie{
+		ID:          " ",
+		Title:       "Inception",
+		Description: "A mind-bending thriller",
+		Genre:       "Sci-Fi",
+		Rating:      8.8,
+	}
+
+	jsonMovie, _ := json.Marshal(movie)
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/movies/"+movie.ID, bytes.NewReader(jsonMovie))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/api/v1/movies/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("123")
+
+	mockService.EXPECT().UpdateMovie(gomock.Any(), gomock.Any()).Return(nil)
+
+	err := movieHandler.UpdateMovie(c)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+}
