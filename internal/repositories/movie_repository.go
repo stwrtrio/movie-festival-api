@@ -10,6 +10,7 @@ import (
 
 type MovieRepository interface {
 	CreateMovie(ctx context.Context, movie *models.Movie) error
+	UpdateMovie(ctx context.Context, movie *models.Movie) error
 }
 
 type movieRepository struct {
@@ -22,4 +23,8 @@ func NewMovieRepository(db *gorm.DB) MovieRepository {
 
 func (r *movieRepository) CreateMovie(ctx context.Context, movie *models.Movie) error {
 	return r.db.Create(movie).Error
+}
+
+func (r *movieRepository) UpdateMovie(ctx context.Context, movie *models.Movie) error {
+	return r.db.WithContext(ctx).Updates(movie).Error
 }

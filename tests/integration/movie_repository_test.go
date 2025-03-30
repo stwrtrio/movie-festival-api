@@ -94,12 +94,12 @@ func TestUpdateMovie_Success(t *testing.T) {
 		Rating:      8.5,
 	}
 
-	err := movieRepo.UpdateMovie(&updatedMovie)
+	err := movieRepo.UpdateMovie(context.Background(), &updatedMovie)
 	assert.NoError(t, err)
 
 	// Verify update
 	var result models.Movie
-	testDB.First(&result, movie.ID)
+	testDB.Where("id = ?", movie.ID).First(&result)
 
 	assert.Equal(t, updatedMovie.Title, result.Title)
 	assert.Equal(t, updatedMovie.Description, result.Description)
@@ -107,6 +107,6 @@ func TestUpdateMovie_Success(t *testing.T) {
 	assert.Equal(t, updatedMovie.Rating, result.Rating)
 
 	// Clean up record
-	testDB.Where("id = ?", movie.ID).Delete(&models.Movie{})
+	testDB.Where("id = ?", result.ID).Delete(&models.Movie{})
 	testDB.Unscoped().Delete(&models.Movie{})
 }
