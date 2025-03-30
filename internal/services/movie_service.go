@@ -9,6 +9,7 @@ import (
 
 type MovieService interface {
 	CreateMovie(ctx context.Context, movie *models.Movie) error
+	UpdateMovie(ctx context.Context, movie *models.Movie) error
 }
 
 type movieService struct {
@@ -21,4 +22,8 @@ func NewMovieService(repo repositories.MovieRepository) MovieService {
 
 func (s *movieService) CreateMovie(ctx context.Context, movie *models.Movie) error {
 	return s.repo.CreateMovie(ctx, movie)
+}
+
+func (s *movieService) UpdateMovie(ctx context.Context, movie *models.Movie) error {
+	return s.repo.UpdateMovie(ctx, movie)
 }
