@@ -6,7 +6,7 @@ import (
 )
 
 // InitRoutes to initializes the routes for the application
-func InitRoutes(e *echo.Echo) {
+func InitRoutes(e *echo.Echo, movieHandler *handlers.MovieHandler) {
 	// endpoint health check
 	e.GET("/health-check", handlers.HealthCheckHandler)
 
@@ -15,4 +15,7 @@ func InitRoutes(e *echo.Echo) {
 
 	// endpoint for user authentication
 	InitAuthRoutes(v1)
+
+	// endpoint for movie
+	InitMovieRoutes(v1, movieHandler)
 }
