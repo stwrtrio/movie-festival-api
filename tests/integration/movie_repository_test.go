@@ -68,4 +68,8 @@ func TestCreateMovie_Success(t *testing.T) {
 	// Assert
 	assert.NoError(t, err)
 	assert.NotZero(t, movie.ID)
+
+	// Clean up record
+	testDB.Where("id = ?", movie.ID).Delete(&models.Movie{})
+	testDB.Unscoped().Delete(&models.Movie{})
 }

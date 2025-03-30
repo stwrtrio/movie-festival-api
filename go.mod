@@ -42,4 +42,5 @@ require (
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/text v0.22.0 // indirect
 	gorm.io/driver/mysql v1.5.7
+	gorm.io/plugin/soft_delete v1.2.1
 )

@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"errors"
 
 	"github.com/stwrtrio/movie-festival-api/internal/models"
 
@@ -22,5 +21,5 @@ func NewMovieRepository(db *gorm.DB) MovieRepository {
 }
 
 func (r *movieRepository) CreateMovie(ctx context.Context, movie *models.Movie) error {
-	return errors.New("not implemented")
+	return r.db.Create(movie).Error
 }
