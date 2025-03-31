@@ -2,8 +2,10 @@ package unit_test
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/stwrtrio/movie-festival-api/internal/mocks"
 	"github.com/stwrtrio/movie-festival-api/internal/models"
@@ -19,18 +21,35 @@ func TestRateMovie_Success(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockRatingRepository(ctrl)
-	ratingService := services.NewRatingService(mockRepo)
+	mockProducer := mocks.NewMockProducer(ctrl)
+
+	ratingService := services.NewRatingService(mockRepo, mockProducer)
 
 	// Mock input data
 	rating := &models.Rating{
-		ID:      utils.GenerateUUID(),
-		MovieID: "movie-123",
-		UserID:  "user-456",
-		Score:   8.5,
-		Comment: "Great movie!",
+		ID:        utils.GenerateUUID(),
+		MovieID:   "movie-123",
+		UserID:    "user-456",
+		Score:     8.5,
+		Comment:   "Great movie!",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
-	mockRepo.EXPECT().CreateRating(gomock.Any(), gomock.Any()).Return(nil)
+	mockRepo.EXPECT().RateMovie(gomock.Any(), rating).Return(nil)
+
+	expectedEvent := &models.Event{
+		ID:        rating.ID,
+		UserID:    rating.UserID,
+		MovieID:   rating.MovieID,
+		Score:     rating.Score,
+		Comment:   rating.Comment,
+		CreatedAt: rating.CreatedAt.String(),
+		UpdatedAt: rating.UpdatedAt.String(),
+	}
+	expectedEventData, _ := json.Marshal(expectedEvent)
+
+	mockProducer.EXPECT().ProduceMessage(gomock.Any(), expectedEventData).Return(nil)
 
 	err := ratingService.RateMovie(context.Background(), rating)
 
@@ -43,7 +62,9 @@ func TestRateMovie_Fail_DatabaseError(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockRatingRepository(ctrl)
-	ratingService := services.NewRatingService(mockRepo)
+	mockProducer := mocks.NewMockProducer(ctrl)
+
+	ratingService := services.NewRatingService(mockRepo, mockProducer)
 
 	rating := &models.Rating{
 		ID:      utils.GenerateUUID(),
@@ -53,7 +74,7 @@ func TestRateMovie_Fail_DatabaseError(t *testing.T) {
 		Comment: "Amazing!",
 	}
 
-	mockRepo.EXPECT().CreateRating(gomock.Any(), gomock.Any()).Return(errors.New("database error"))
+	mockRepo.EXPECT().RateMovie(gomock.Any(), gomock.Any()).Return(errors.New("database error"))
 
 	err := ratingService.RateMovie(context.Background(), rating)
 

@@ -10,6 +10,7 @@ import (
 	"github.com/stwrtrio/movie-festival-api/internal/repositories"
 	"github.com/stwrtrio/movie-festival-api/internal/routes"
 	"github.com/stwrtrio/movie-festival-api/internal/services"
+	"github.com/stwrtrio/movie-festival-api/pkg/kafka"
 )
 
 func main() {
@@ -20,13 +21,15 @@ func main() {
 	config.InitDB()
 	config.InitRedis()
 
-	// Initialize Kafka
-	kafkaClient, err := config.InitKafka()
+	// Initialize Kafka configuration
+	kafkaConfig := config.LoadKafkaConfig()
+
+	// Init producer
+	producer, err := kafka.NewProducer(kafkaConfig.Brokers)
 	if err != nil {
-		log.Fatalf("Failed to initialize Kafka: %v", err)
+		log.Fatal("Failed to create Kafka producer:", err)
 	}
-	log.Println("Connected to Kafka")
-	defer kafkaClient.Close()
+	defer producer.Close()
 
 	// Setup Echo server
 	e := echo.New()

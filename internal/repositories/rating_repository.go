@@ -6,6 +6,7 @@ import (
 	"github.com/stwrtrio/movie-festival-api/internal/models"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type RatingRepository interface {
@@ -21,5 +22,10 @@ func NewRatingRepository(db *gorm.DB) RatingRepository {
 }
 
 func (r *ratingRepository) RateMovie(ctx context.Context, rating *models.Rating) error {
-	return r.db.WithContext(ctx).Create(rating).Error
+	result := r.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"score", "comment"}),
+	}).Create(&rating)
+
+	return result.Error
 }
