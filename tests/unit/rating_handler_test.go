@@ -3,6 +3,7 @@ package unit_test
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -42,9 +43,10 @@ func TestRateMovieHandler_Success(t *testing.T) {
 	err := ratingHandler.RateMovie(c)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
+
 }
 
-func TestRateMovieHandler_Failed_DatabaseError(t *testing.T) {
+func TestRateMovieHandler_Failed(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -53,7 +55,7 @@ func TestRateMovieHandler_Failed_DatabaseError(t *testing.T) {
 
 	e := echo.New()
 	rating := &models.RatingRequest{
-		MovieID: "movie-123",
+		MovieID: "",
 		UserID:  "user-456",
 		Score:   8.5,
 		Comment: "Great movie!",
@@ -64,6 +66,8 @@ func TestRateMovieHandler_Failed_DatabaseError(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+
+	mockService.EXPECT().RateMovie(gomock.Any(), gomock.Any()).Return(errors.New("database error"))
 
 	err := ratingHandler.RateMovie(c)
 	assert.NoError(t, err)

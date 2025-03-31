@@ -39,15 +39,18 @@ func main() {
 
 	// Initialize repositories
 	movieRepo := repositories.NewMovieRepository(config.DB)
+	ratingRepo := repositories.NewRatingRepository(config.DB)
 
 	// Initialize services
 	movieService := services.NewMovieService(movieRepo)
+	ratingService := services.NewRatingService(ratingRepo, producer)
 
 	// Initialize handlers
 	movieHandler := handlers.NewMovieHandler(movieService)
+	ratingHandler := handlers.NewRatingHandler(ratingService)
 
 	// Initialize routes
-	routes.InitRoutes(e, movieHandler)
+	routes.InitRoutes(e, movieHandler, ratingHandler)
 
 	// Start server
 	log.Println("Starting server on :8080")
