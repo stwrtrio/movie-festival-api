@@ -10,6 +10,7 @@ import (
 	"github.com/stwrtrio/movie-festival-api/internal/repositories"
 	"github.com/stwrtrio/movie-festival-api/internal/routes"
 	"github.com/stwrtrio/movie-festival-api/internal/services"
+	"github.com/stwrtrio/movie-festival-api/pkg/kafka"
 )
 
 func main() {
@@ -20,6 +21,16 @@ func main() {
 	config.InitDB()
 	config.InitRedis()
 
+	// Initialize Kafka configuration
+	kafkaConfig := config.LoadKafkaConfig()
+
+	// Init producer
+	producer, err := kafka.NewProducer(kafkaConfig.Brokers)
+	if err != nil {
+		log.Fatal("Failed to create Kafka producer:", err)
+	}
+	defer producer.Close()
+
 	// Setup Echo server
 	e := echo.New()
 
@@ -28,15 +39,18 @@ func main() {
 
 	// Initialize repositories
 	movieRepo := repositories.NewMovieRepository(config.DB)
+	ratingRepo := repositories.NewRatingRepository(config.DB)
 
 	// Initialize services
 	movieService := services.NewMovieService(movieRepo)
+	ratingService := services.NewRatingService(ratingRepo, producer, kafkaConfig.Topic)
 
 	// Initialize handlers
 	movieHandler := handlers.NewMovieHandler(movieService)
+	ratingHandler := handlers.NewRatingHandler(ratingService)
 
 	// Initialize routes
-	routes.InitRoutes(e, movieHandler)
+	routes.InitRoutes(e, movieHandler, ratingHandler)
 
 	// Start server
 	log.Println("Starting server on :8080")
