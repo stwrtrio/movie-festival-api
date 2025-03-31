@@ -2,6 +2,13 @@ package models
 
 import "time"
 
+type RatingRequest struct {
+	MovieID string  `json:"movie_id" validation:"required"`
+	UserID  string  `json:"user_id" validation:"required"`
+	Score   float64 `json:"score" validation:"required"`
+	Comment string  `json:"comment"`
+}
+
 type Rating struct {
 	ID        string    `json:"id" gorm:"type:varchar(36);primaryKey"`
 	MovieID   string    `json:"movie_id" gorm:"type:varchar(36);index;not null"`
