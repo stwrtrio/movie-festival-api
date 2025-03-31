@@ -20,6 +20,14 @@ func main() {
 	config.InitDB()
 	config.InitRedis()
 
+	// Initialize Kafka
+	kafkaClient, err := config.InitKafka()
+	if err != nil {
+		log.Fatalf("Failed to initialize Kafka: %v", err)
+	}
+	log.Println("Connected to Kafka")
+	defer kafkaClient.Close()
+
 	// Setup Echo server
 	e := echo.New()
 
