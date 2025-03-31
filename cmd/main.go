@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -9,6 +10,7 @@ import (
 	"github.com/stwrtrio/movie-festival-api/internal/handlers"
 	"github.com/stwrtrio/movie-festival-api/internal/repositories"
 	"github.com/stwrtrio/movie-festival-api/internal/routes"
+	"github.com/stwrtrio/movie-festival-api/internal/schedulers"
 	"github.com/stwrtrio/movie-festival-api/internal/services"
 	"github.com/stwrtrio/movie-festival-api/pkg/kafka"
 )
@@ -44,6 +46,11 @@ func main() {
 	// Initialize services
 	movieService := services.NewMovieService(movieRepo)
 	ratingService := services.NewRatingService(ratingRepo, producer, kafkaConfig.Topic)
+
+	// Initialize scheduler
+	scheduler := schedulers.NewScheduler()
+
+	scheduler.Start(10 * time.Second)
 
 	// Initialize handlers
 	movieHandler := handlers.NewMovieHandler(movieService)
