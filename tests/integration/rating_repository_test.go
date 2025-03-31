@@ -55,11 +55,10 @@ func TestUpdateMovieRating_Success(t *testing.T) {
 	TestDB.Create(movie)
 
 	ratings := []models.Rating{
-		{MovieID: movie.ID, UserID: "user-1", Score: 8},
-		{MovieID: movie.ID, UserID: "user-2", Score: 6},
-		{MovieID: movie.ID, UserID: "user-3", Score: 7},
+		{ID: utils.GenerateUUID(), MovieID: movie.ID, UserID: "user-1", Score: 8},
+		{ID: utils.GenerateUUID(), MovieID: movie.ID, UserID: "user-2", Score: 6},
+		{ID: utils.GenerateUUID(), MovieID: movie.ID, UserID: "user-3", Score: 7},
 	}
-
 	TestDB.Create(&ratings)
 
 	err := ratingRepo.UpdateMovieRating(context.Background(), movie.ID)

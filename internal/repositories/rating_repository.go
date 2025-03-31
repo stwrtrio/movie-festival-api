@@ -11,6 +11,7 @@ import (
 
 type RatingRepository interface {
 	RateMovie(ctx context.Context, rating *models.Rating) error
+	UpdateMovieRating(ctx context.Context, movieID string) error
 }
 
 type ratingRepository struct {
@@ -32,4 +33,20 @@ func (r *ratingRepository) RateMovie(ctx context.Context, rating *models.Rating)
 	}).Create(&rating)
 
 	return result.Error
+}
+
+func (r *ratingRepository) UpdateMovieRating(ctx context.Context, movieID string) error {
+	var avgRating float64
+
+	err := r.db.Model(&models.Rating{}).
+		Select("COALESCE(AVG(score), 0)").
+		Where("movie_id = ?", movieID).
+		Scan(&avgRating).Error
+	if err != nil {
+		return err
+	}
+
+	return r.db.Model(&models.Movie{}).
+		Where("id = ?", movieID).
+		Update("rating", avgRating).Error
 }
