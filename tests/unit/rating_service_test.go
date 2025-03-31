@@ -23,7 +23,7 @@ func TestRateMovie_Success(t *testing.T) {
 	mockRepo := mocks.NewMockRatingRepository(ctrl)
 	mockProducer := mocks.NewMockProducer(ctrl)
 
-	ratingService := services.NewRatingService(mockRepo, mockProducer)
+	ratingService := services.NewRatingService(mockRepo, mockProducer, "")
 
 	// Mock input data
 	rating := &models.Rating{
@@ -64,7 +64,7 @@ func TestRateMovie_Fail_DatabaseError(t *testing.T) {
 	mockRepo := mocks.NewMockRatingRepository(ctrl)
 	mockProducer := mocks.NewMockProducer(ctrl)
 
-	ratingService := services.NewRatingService(mockRepo, mockProducer)
+	ratingService := services.NewRatingService(mockRepo, mockProducer, "")
 
 	rating := &models.Rating{
 		ID:      utils.GenerateUUID(),

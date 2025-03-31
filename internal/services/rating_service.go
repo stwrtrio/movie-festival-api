@@ -20,8 +20,8 @@ type ratingService struct {
 	kafkaTopic    string
 }
 
-func NewRatingService(ratingRepo repositories.RatingRepository, producer kafka.Producer) RatingService {
-	return &ratingService{ratingRepo: ratingRepo, kafkaProducer: producer}
+func NewRatingService(ratingRepo repositories.RatingRepository, producer kafka.Producer, kafkaTopic string) RatingService {
+	return &ratingService{ratingRepo: ratingRepo, kafkaProducer: producer, kafkaTopic: kafkaTopic}
 }
 
 func (s *ratingService) RateMovie(ctx context.Context, rating *models.Rating) error {

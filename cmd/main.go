@@ -43,7 +43,7 @@ func main() {
 
 	// Initialize services
 	movieService := services.NewMovieService(movieRepo)
-	ratingService := services.NewRatingService(ratingRepo, producer)
+	ratingService := services.NewRatingService(ratingRepo, producer, kafkaConfig.Topic)
 
 	// Initialize handlers
 	movieHandler := handlers.NewMovieHandler(movieService)
