@@ -3,7 +3,6 @@ package unit
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -25,11 +24,13 @@ func TestCreateMovieHandler_Success(t *testing.T) {
 	movieHandler := handlers.NewMovieHandler(mockService)
 
 	e := echo.New()
-	movie := &models.Movie{
+	movie := &models.MovieRequest{
 		Title:       "Inception",
 		Description: "A mind-bending thriller",
 		Genre:       "Sci-Fi",
-		Rating:      8.8,
+		Duration:    120,
+		WatchURL:    "http://example.com/watch",
+		Artist:      "Christopher Nolan",
 	}
 
 	jsonMovie, _ := json.Marshal(movie)
@@ -53,11 +54,13 @@ func TestCreateMovieHandler_Failed(t *testing.T) {
 	movieHandler := handlers.NewMovieHandler(mockService)
 
 	e := echo.New()
-	movie := &models.Movie{
+	movie := &models.MovieRequest{
 		Title:       "",
 		Description: "A mind-bending thriller",
 		Genre:       "Sci-Fi",
-		Rating:      8.8,
+		Duration:    120,
+		WatchURL:    "http://example.com/watch",
+		Artist:      "Christopher Nolan",
 	}
 
 	jsonMovie, _ := json.Marshal(movie)
@@ -65,8 +68,6 @@ func TestCreateMovieHandler_Failed(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-
-	mockService.EXPECT().CreateMovie(gomock.Any(), gomock.Any()).Return(errors.New("invalid title"))
 
 	err := movieHandler.CreateMovie(c)
 	assert.NoError(t, err)
@@ -131,8 +132,6 @@ func TestUpdateMovieHandler_Failed(t *testing.T) {
 	c.SetPath("/api/v1/movies/:id")
 	c.SetParamNames("id")
 	c.SetParamValues("123")
-
-	mockService.EXPECT().UpdateMovie(gomock.Any(), gomock.Any()).Return(nil)
 
 	err := movieHandler.UpdateMovie(c)
 	assert.NoError(t, err)
