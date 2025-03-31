@@ -14,6 +14,7 @@ import (
 
 var TestDB *gorm.DB
 var movieRepo repositories.MovieRepository
+var ratingRepo repositories.RatingRepository
 
 func InitTestDB() *gorm.DB {
 	if TestDB != nil {
@@ -40,7 +41,7 @@ func InitTestDB() *gorm.DB {
 	TestDB = db
 
 	movieRepo = repositories.NewMovieRepository(TestDB)
-	// ratingRepo = repositories.NewRatingRepository(TestDB)
+	ratingRepo = repositories.NewRatingRepository(TestDB)
 
 	log.Println("Connected to test database")
 
