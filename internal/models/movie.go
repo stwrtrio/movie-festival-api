@@ -24,7 +24,7 @@ type Movie struct {
 	Genre       string                `json:"genre"`
 	WatchURL    string                `json:"watch_url"`
 	Artist      string                `json:"artist"`
-	Rating      float64               `json:"rating"`
+	Rating      float64               `json:"rating" gorm:"type:decimal(3,1);default:0.0" `
 	IsDeleted   soft_delete.DeletedAt `json:"is_deleted" gorm:"softDelete:flag,DeletedAtField:DeletedAt"`
 	CreatedAt   time.Time             `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt   time.Time             `json:"updated_at" gorm:"autoUpdateTime"`

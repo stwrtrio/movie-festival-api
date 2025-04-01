@@ -33,6 +33,12 @@ func main() {
 	}
 	defer producer.Close()
 
+	consumer, err := kafka.NewConsumer(kafkaConfig.Brokers, kafkaConfig.GroupID)
+	if err != nil {
+		log.Fatalf("Failed to create Kafka consumer: %v", err)
+	}
+	defer consumer.Close()
+
 	// Setup Echo server
 	e := echo.New()
 
@@ -49,6 +55,13 @@ func main() {
 
 	// Initialize scheduler
 	scheduler := schedulers.NewScheduler()
+
+	ratingScheduler := schedulers.RatingEventScheduler{
+		Consumer:   consumer,
+		RatingRepo: ratingRepo,
+	}
+
+	scheduler.AddTask(ratingScheduler.ProcessRatingEvents)
 
 	scheduler.Start(10 * time.Second)
 
