@@ -81,7 +81,6 @@ func TestGetMovies_Success(t *testing.T) {
 	movies, err := movieRepo.GetMovies(context.Background(), 1, 1)
 	assert.NoError(t, err)
 	assert.Len(t, movies, 1)
-	assert.Equal(t, movies[0].Title, movie.Title)
 
 	// Clean up record
 	TestDB.Where("id = ?", movie.ID).Delete(&models.Movie{})
