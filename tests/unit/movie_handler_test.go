@@ -3,14 +3,18 @@ package unit
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/stwrtrio/movie-festival-api/internal/handlers"
 	"github.com/stwrtrio/movie-festival-api/internal/mocks"
 	"github.com/stwrtrio/movie-festival-api/internal/models"
+	"github.com/stwrtrio/movie-festival-api/pkg/utils"
+	"gorm.io/gorm"
 
 	"github.com/golang/mock/gomock"
 	"github.com/labstack/echo/v4"
@@ -147,37 +151,44 @@ func TestGetMoviesHandler_Success(t *testing.T) {
 	movieHandler := handlers.NewMovieHandler(mockService)
 
 	e := echo.New()
+	data := &models.Movie{
+		ID:          utils.GenerateUUID(),
+		Title:       "Inception",
+		Description: "A mind-bending thriller",
+		Genre:       "Sci-Fi",
+		Duration:    120,
+		WatchURL:    "http://example.com/watch",
+		Artist:      "Christopher Nolan",
+		IsDeleted:   0,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+		DeletedAt:   gorm.DeletedAt{},
+	}
+
 	movie := &models.PaginationResponse{
 		Page:       1,
-		PageSize:   1,
+		PageSize:   5,
 		TotalItems: 1,
 		TotalPages: 1,
-		Data: models.Movie{
-			Title:       "Inception",
-			Description: "A mind-bending thriller",
-			Genre:       "Sci-Fi",
-			Duration:    120,
-			WatchURL:    "http://example.com/watch",
-			Artist:      "Christopher Nolan",
-		},
+		Data:       data,
 	}
 
 	page := 1
-	limit := 5
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/movies?page="+strconv.Itoa(page)+"&limit="+strconv.Itoa(limit), nil)
+	pageSize := 5
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/movies?page="+strconv.Itoa(page)+"&page_size="+strconv.Itoa(pageSize), nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	mockService.EXPECT().GetMovies(gomock.Any(), gomock.Any()).Return(nil)
+	mockService.EXPECT().GetMovies(gomock.Any(), models.PaginationRequest{Page: page, PageSize: pageSize}).Return(movie, nil)
 
 	err := movieHandler.GetMovies(c)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 
-	var response []models.Movie
-	err = json.Unmarshal(rec.Body.Bytes(), &response)
-	assert.NoError(t, err)
-	assert.Equal(t, movie, response)
+	expectedJSON, _ := json.Marshal(movie)
+	actualJSON := rec.Body.Bytes()
+
+	assert.JSONEq(t, string(expectedJSON), string(actualJSON))
 }
 
 func TestGetMoviesHandler_Failed(t *testing.T) {
@@ -188,35 +199,16 @@ func TestGetMoviesHandler_Failed(t *testing.T) {
 	movieHandler := handlers.NewMovieHandler(mockService)
 
 	e := echo.New()
-	movie := &models.PaginationResponse{
-		Page:       1,
-		PageSize:   1,
-		TotalItems: 1,
-		TotalPages: 1,
-		Data: models.Movie{
-			Title:       "Inception",
-			Description: "A mind-bending thriller",
-			Genre:       "Sci-Fi",
-			Duration:    120,
-			WatchURL:    "http://example.com/watch",
-			Artist:      "Christopher Nolan",
-		},
-	}
 
 	page := 1
-	limit := 5
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/movies?page="+strconv.Itoa(page)+"&limit="+strconv.Itoa(limit), nil)
+	pageSize := 5
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/movies?page="+strconv.Itoa(page)+"&page_size="+strconv.Itoa(pageSize), nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	mockService.EXPECT().GetMovies(gomock.Any(), gomock.Any()).Return(nil)
+	mockService.EXPECT().GetMovies(gomock.Any(), models.PaginationRequest{Page: page, PageSize: pageSize}).Return(nil, errors.New("database error"))
 
 	err := movieHandler.GetMovies(c)
 	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, rec.Code)
-
-	var response models.PaginationResponse
-	err = json.Unmarshal(rec.Body.Bytes(), &response)
-	assert.NoError(t, err)
-	assert.Equal(t, movie, response)
+	assert.Equal(t, http.StatusInternalServerError, rec.Code)
 }

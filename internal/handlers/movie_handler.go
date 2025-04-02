@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/stwrtrio/movie-festival-api/internal/models"
 	"github.com/stwrtrio/movie-festival-api/internal/services"
@@ -80,4 +81,28 @@ func (h *MovieHandler) UpdateMovie(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "movie updated successfully"})
+}
+
+func (h *MovieHandler) GetMovies(c echo.Context) error {
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	if page < 1 {
+		page = 1
+	}
+
+	pageSize, _ := strconv.Atoi(c.QueryParam("page_size"))
+	if pageSize < 1 || pageSize > 100 {
+		pageSize = 10
+	}
+
+	pagination := models.PaginationRequest{
+		Page:     page,
+		PageSize: pageSize,
+	}
+
+	result, err := h.service.GetMovies(c.Request().Context(), pagination)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
 }

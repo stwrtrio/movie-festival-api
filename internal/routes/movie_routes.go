@@ -7,6 +7,7 @@ import (
 )
 
 func InitMovieRoutes(e *echo.Group, movieHandler *handlers.MovieHandler) {
+	e.GET("/movies", movieHandler.GetMovies)
 	e.POST("/movies", movieHandler.CreateMovie)
 	e.PUT("/movies/:id", movieHandler.UpdateMovie)
 }
