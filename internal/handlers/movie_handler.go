@@ -99,7 +99,12 @@ func (h *MovieHandler) GetMovies(c echo.Context) error {
 		PageSize: pageSize,
 	}
 
-	result, err := h.service.GetMovies(c.Request().Context(), pagination)
+	useCache := false
+	if c.QueryParam("use_cache") == "true" || c.QueryParam("use_cache") == "1" {
+		useCache = true
+	}
+
+	result, err := h.service.GetMovies(c.Request().Context(), pagination, useCache)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}

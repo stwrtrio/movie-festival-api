@@ -13,6 +13,7 @@ import (
 	"github.com/stwrtrio/movie-festival-api/internal/schedulers"
 	"github.com/stwrtrio/movie-festival-api/internal/services"
 	"github.com/stwrtrio/movie-festival-api/pkg/kafka"
+	"github.com/stwrtrio/movie-festival-api/pkg/utils"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func main() {
 
 	// Initialize database and Redis
 	config.InitDB()
-	config.InitRedis()
+	redisClient := config.NewRedisClient()
 
 	// Initialize Kafka configuration
 	kafkaConfig := config.LoadKafkaConfig()
@@ -50,7 +51,7 @@ func main() {
 	ratingRepo := repositories.NewRatingRepository(config.DB)
 
 	// Initialize services
-	movieService := services.NewMovieService(movieRepo)
+	movieService := services.NewMovieService(movieRepo, redisClient, utils.GetRedisCacheTTL())
 	ratingService := services.NewRatingService(ratingRepo, producer, kafkaConfig.Topic)
 
 	// Initialize scheduler

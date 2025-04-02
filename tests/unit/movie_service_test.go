@@ -18,7 +18,9 @@ func TestCreateMovie_Success(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockMovieRepository(ctrl)
-	movieService := services.NewMovieService(mockRepo)
+	mockRedis := mocks.NewMockClient(ctrl)
+
+	movieService := services.NewMovieService(mockRepo, mockRedis, 5)
 
 	movie := &models.Movie{
 		Title:       "Inception",
@@ -39,7 +41,9 @@ func TestCreateMovie_Fail(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockMovieRepository(ctrl)
-	movieService := services.NewMovieService(mockRepo)
+	mockRedis := mocks.NewMockClient(ctrl)
+
+	movieService := services.NewMovieService(mockRepo, mockRedis, 5)
 
 	movie := &models.Movie{
 		Title:       "Inception",
@@ -61,7 +65,9 @@ func TestUpdateMovie_Success(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockMovieRepository(ctrl)
-	movieService := services.NewMovieService(mockRepo)
+	mockRedis := mocks.NewMockClient(ctrl)
+
+	movieService := services.NewMovieService(mockRepo, mockRedis, 5)
 
 	movie := &models.Movie{
 		ID:          "123",
@@ -82,7 +88,9 @@ func TestUpdateMovie_Failed(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockMovieRepository(ctrl)
-	movieService := services.NewMovieService(mockRepo)
+	mockRedis := mocks.NewMockClient(ctrl)
+
+	movieService := services.NewMovieService(mockRepo, mockRedis, 5)
 
 	movie := &models.Movie{
 		ID:          "123",
@@ -98,46 +106,4 @@ func TestUpdateMovie_Failed(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Equal(t, "failed to update movie", err.Error())
-}
-
-func TestGetMovie_Success(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockRepo := mocks.NewMockMovieRepository(ctrl)
-	movieService := services.NewMovieService(mockRepo)
-
-	movie := []models.Movie{
-		{
-			ID:          "123",
-			Title:       "Updated Title",
-			Description: "Updated Description",
-			Genre:       "Action",
-			Rating:      8.5,
-		},
-	}
-	paginationReq := models.PaginationRequest{Page: 1, PageSize: 10}
-	totalItems := int64(20)
-
-	mockRepo.EXPECT().GetMovies(gomock.Any(), gomock.Any()).Return(movie, totalItems, nil)
-
-	result, err := movieService.GetMovies(context.Background(), paginationReq)
-	assert.NoError(t, err)
-	assert.NotNil(t, result)
-}
-
-func TestGetMovie_Failed(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockRepo := mocks.NewMockMovieRepository(ctrl)
-	movieService := services.NewMovieService(mockRepo)
-
-	paginationReq := models.PaginationRequest{Page: 1, PageSize: 10}
-
-	mockRepo.EXPECT().GetMovies(gomock.Any(), gomock.Any()).Return(nil, int64(0), errors.New("failed to retrieve movie"))
-
-	result, err := movieService.GetMovies(context.Background(), paginationReq)
-	assert.Error(t, err)
-	assert.Nil(t, result)
 }

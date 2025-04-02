@@ -179,7 +179,7 @@ func TestGetMoviesHandler_Success(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	mockService.EXPECT().GetMovies(gomock.Any(), models.PaginationRequest{Page: page, PageSize: pageSize}).Return(movie, nil)
+	mockService.EXPECT().GetMovies(gomock.Any(), models.PaginationRequest{Page: page, PageSize: pageSize}, false).Return(movie, nil)
 
 	err := movieHandler.GetMovies(c)
 	assert.NoError(t, err)
@@ -206,7 +206,7 @@ func TestGetMoviesHandler_Failed(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	mockService.EXPECT().GetMovies(gomock.Any(), models.PaginationRequest{Page: page, PageSize: pageSize}).Return(nil, errors.New("database error"))
+	mockService.EXPECT().GetMovies(gomock.Any(), models.PaginationRequest{Page: page, PageSize: pageSize}, false).Return(nil, errors.New("database error"))
 
 	err := movieHandler.GetMovies(c)
 	assert.NoError(t, err)

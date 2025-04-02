@@ -12,8 +12,18 @@ import (
 
 var RedisClient *redis.Client
 
+type Client interface {
+	// Basic commands
+	Get(ctx context.Context, key string) *redis.StringCmd
+	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd
+	Del(ctx context.Context, keys ...string) *redis.IntCmd
+
+	Ping(ctx context.Context) *redis.StatusCmd
+	Close() error
+}
+
 // InitRedis initializes Redis connection
-func InitRedis() {
+func NewRedisClient() Client {
 	RedisClient = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT")),
 		Password: os.Getenv("REDIS_PASSWORD"),
@@ -30,4 +40,6 @@ func InitRedis() {
 	}
 
 	log.Println("Redis connection established")
+
+	return RedisClient
 }
