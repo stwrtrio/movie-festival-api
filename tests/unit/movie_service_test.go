@@ -99,3 +99,27 @@ func TestUpdateMovie_Failed(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, "failed to update movie", err.Error())
 }
+
+func TestGetMovie_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockRepo := mocks.NewMockMovieRepository(ctrl)
+	movieService := services.NewMovieService(mockRepo)
+
+	movie := &models.Movie{
+		ID:          "123",
+		Title:       "Updated Title",
+		Description: "Updated Description",
+		Genre:       "Action",
+		Rating:      8.5,
+	}
+	paginationReq := models.PaginationRequest{Page: 1, PageSize: 10}
+	totalItems := int64(20)
+
+	mockRepo.EXPECT().GetMovie(gomock.Any(), gomock.Any()).Return(movie, totalItems, nil)
+
+	result, err := movieService.GetMovie(context.Background(), paginationReq)
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+}
