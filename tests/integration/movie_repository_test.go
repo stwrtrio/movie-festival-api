@@ -78,9 +78,14 @@ func TestGetMovies_Success(t *testing.T) {
 	}
 	TestDB.Create(&movie)
 
-	movies, err := movieRepo.GetMovies(context.Background(), 1, 1)
+	paginationReq := models.PaginationRequest{
+		Page:     1,
+		PageSize: 10,
+	}
+
+	movies, total, err := movieRepo.GetMovies(context.Background(), paginationReq)
 	assert.NoError(t, err)
-	assert.Len(t, movies, 1)
+	assert.Equal(t, int(total), len(movies))
 
 	// Clean up record
 	TestDB.Where("id = ?", movie.ID).Delete(&models.Movie{})

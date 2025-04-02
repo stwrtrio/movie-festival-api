@@ -11,7 +11,7 @@ import (
 type MovieRepository interface {
 	CreateMovie(ctx context.Context, movie *models.Movie) error
 	UpdateMovie(ctx context.Context, movie *models.Movie) error
-	GetMovies(ctx context.Context, page, limit int) ([]models.Movie, error)
+	GetMovies(ctx context.Context, pagination models.PaginationRequest) ([]models.Movie, int64, error)
 }
 
 type movieRepository struct {
@@ -30,14 +30,23 @@ func (r *movieRepository) UpdateMovie(ctx context.Context, movie *models.Movie) 
 	return r.db.WithContext(ctx).Updates(movie).Error
 }
 
-func (r *movieRepository) GetMovies(ctx context.Context, page, limit int) ([]models.Movie, error) {
+func (r *movieRepository) GetMovies(ctx context.Context, pagination models.PaginationRequest) ([]models.Movie, int64, error) {
 	var movies []models.Movie
-	offset := (page - 1) * limit
+	var total int64
+
+	offset := (pagination.Page - 1) * pagination.PageSize
+
+	if err := r.db.WithContext(ctx).Model(&models.Movie{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
 
 	err := r.db.WithContext(ctx).
-		Limit(limit).
+		Limit(pagination.PageSize).
 		Offset(offset).
 		Find(&movies).Error
+	if err != nil {
+		return nil, 0, err
+	}
 
-	return movies, err
+	return movies, total, err
 }
