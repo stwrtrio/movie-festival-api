@@ -49,6 +49,21 @@ func (mr *MockMovieServiceMockRecorder) CreateMovie(ctx, movie interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateMovie", reflect.TypeOf((*MockMovieService)(nil).CreateMovie), ctx, movie)
 }
 
+// GetMovies mocks base method.
+func (m *MockMovieService) GetMovies(ctx context.Context, pagination models.PaginationRequest) (*models.PaginationResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetMovies", ctx, pagination)
+	ret0, _ := ret[0].(*models.PaginationResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetMovies indicates an expected call of GetMovies.
+func (mr *MockMovieServiceMockRecorder) GetMovies(ctx, pagination interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMovies", reflect.TypeOf((*MockMovieService)(nil).GetMovies), ctx, pagination)
+}
+
 // UpdateMovie mocks base method.
 func (m *MockMovieService) UpdateMovie(ctx context.Context, movie *models.Movie) error {
 	m.ctrl.T.Helper()
