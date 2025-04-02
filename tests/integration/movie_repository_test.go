@@ -66,3 +66,28 @@ func TestUpdateMovie_Success(t *testing.T) {
 	TestDB.Where("id = ?", result.ID).Delete(&models.Movie{})
 	TestDB.Unscoped().Where("id = ?", result.ID).Delete(&models.Movie{})
 }
+
+func TestGetMovies_Success(t *testing.T) {
+	// Insert dummy movie
+	movie := &models.Movie{
+		ID:          utils.GenerateUUID(),
+		Title:       "Old Title",
+		Description: "Old Description",
+		Genre:       "Action",
+		Rating:      7.0,
+	}
+	TestDB.Create(&movie)
+
+	paginationReq := models.PaginationRequest{
+		Page:     1,
+		PageSize: 10,
+	}
+
+	movies, total, err := movieRepo.GetMovies(context.Background(), paginationReq)
+	assert.NoError(t, err)
+	assert.Equal(t, int(total), len(movies))
+
+	// Clean up record
+	TestDB.Where("id = ?", movie.ID).Delete(&models.Movie{})
+	TestDB.Unscoped().Where("id = ?", movie.ID).Delete(&models.Movie{})
+}

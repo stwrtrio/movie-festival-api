@@ -18,7 +18,9 @@ func TestCreateMovie_Success(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockMovieRepository(ctrl)
-	movieService := services.NewMovieService(mockRepo)
+	mockRedis := mocks.NewMockClient(ctrl)
+
+	movieService := services.NewMovieService(mockRepo, mockRedis, 5)
 
 	movie := &models.Movie{
 		Title:       "Inception",
@@ -39,7 +41,9 @@ func TestCreateMovie_Fail(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockMovieRepository(ctrl)
-	movieService := services.NewMovieService(mockRepo)
+	mockRedis := mocks.NewMockClient(ctrl)
+
+	movieService := services.NewMovieService(mockRepo, mockRedis, 5)
 
 	movie := &models.Movie{
 		Title:       "Inception",
@@ -61,7 +65,9 @@ func TestUpdateMovie_Success(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockMovieRepository(ctrl)
-	movieService := services.NewMovieService(mockRepo)
+	mockRedis := mocks.NewMockClient(ctrl)
+
+	movieService := services.NewMovieService(mockRepo, mockRedis, 5)
 
 	movie := &models.Movie{
 		ID:          "123",
@@ -82,7 +88,9 @@ func TestUpdateMovie_Failed(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockMovieRepository(ctrl)
-	movieService := services.NewMovieService(mockRepo)
+	mockRedis := mocks.NewMockClient(ctrl)
+
+	movieService := services.NewMovieService(mockRepo, mockRedis, 5)
 
 	movie := &models.Movie{
 		ID:          "123",
